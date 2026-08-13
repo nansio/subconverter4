@@ -22,7 +22,7 @@
       <section class="hero" id="top">
         <p class="eyebrow">CLASH META CONFIG BUILDER</p>
         <h1>把分享链接，变成<br /><em>可用的代理配置。</em></h1>
-        <p class="hero-copy">支持 3x-ui 等面板生成的 VLESS + Reality + Vision 与 Hysteria2 链接。所有解析均在浏览器本地完成。</p>
+        <p class="hero-copy">支持 3x-ui 等面板生成的 VLESS + Reality + Vision 与 Hysteria2 链接。可一次粘贴多条，所有解析均在浏览器本地完成。</p>
       </section>
 
       <section class="workspace" aria-label="转换工作台">
@@ -30,14 +30,14 @@
           <div class="panel-heading">
             <div>
               <p class="section-kicker">01 · INPUT</p>
-              <h2>粘贴订阅链接</h2>
+              <h2>粘贴分享链接</h2>
             </div>
             <span class="protocol-chip" id="detectedProtocol">等待输入</span>
           </div>
           <label class="sr-only" for="sourceLink">VLESS 或 Hysteria2 分享链接</label>
-          <textarea id="sourceLink" spellcheck="false" placeholder="vless://uuid@server:443?encryption=none&security=reality&...#我的节点&#10;&#10;或粘贴 hysteria2://password@server:443?..." autofocus></textarea>
+          <textarea id="sourceLink" spellcheck="false" placeholder="每行粘贴一个链接，可一次输入多条&#10;vless://uuid@server:443?encryption=none&security=reality&...#我的节点&#10;hysteria2://password@server:443?...#另一节点" autofocus></textarea>
           <div class="input-footer">
-            <span id="inputHint">支持一次粘贴一个链接</span>
+            <span id="inputHint">每行一个链接，支持批量转换</span>
             <button class="primary-btn" id="convertBtn" type="button">
               <span>转换配置</span><b>↗</b>
             </button>
@@ -53,7 +53,7 @@
           <div class="panel-heading">
             <div>
               <p class="section-kicker">02 · OUTPUT</p>
-              <h2>Clash Meta YAML</h2>
+              <h2>Clash Meta 单行 JSON</h2>
             </div>
             <div class="output-actions">
               <button class="icon-btn" id="copyBtn" type="button" title="复制 YAML" disabled>复制</button>
@@ -66,12 +66,12 @@
 <span class="placeholder-text">转换结果将显示在这里</span></code></pre>
             <div class="copy-toast" id="copyToast">已复制到剪贴板</div>
           </div>
-          <div class="output-footer" id="outputFooter">生成后可作为完整的 <code>proxies:</code> 配置片段使用。</div>
+          <div class="output-footer" id="outputFooter">每个代理项均以 Mihomo 支持的单行 JSON（YAML 流式对象）输出。</div>
         </div>
       </section>
 
       <section class="details" id="details" hidden>
-        <div class="detail-title"><span></span>已识别参数</div>
+        <div class="detail-title"><span></span><span id="detailTitle">已识别参数</span></div>
         <div class="detail-grid" id="detailGrid"></div>
       </section>
 
