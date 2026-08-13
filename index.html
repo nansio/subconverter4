@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linkform · Clash Meta 转换器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Linkform 首页">
+          <span class="brand-mark"><i></i><i></i><i></i></span>
+          <span>linkform</span>
+        </a>
+        <div class="topbar-note"><span class="live-dot"></span>Local-first · 不上传链接</div>
+      </header>
+
+      <section class="hero" id="top">
+        <p class="eyebrow">CLASH META CONFIG BUILDER</p>
+        <h1>把分享链接，变成<br /><em>可用的代理配置。</em></h1>
+        <p class="hero-copy">支持 3x-ui 等面板生成的 VLESS + Reality + Vision 与 Hysteria2 链接。所有解析均在浏览器本地完成。</p>
+      </section>
+
+      <section class="workspace" aria-label="转换工作台">
+        <div class="input-panel panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">01 · INPUT</p>
+              <h2>粘贴订阅链接</h2>
+            </div>
+            <span class="protocol-chip" id="detectedProtocol">等待输入</span>
+          </div>
+          <label class="sr-only" for="sourceLink">VLESS 或 Hysteria2 分享链接</label>
+          <textarea id="sourceLink" spellcheck="false" placeholder="vless://uuid@server:443?encryption=none&security=reality&...#我的节点&#10;&#10;或粘贴 hysteria2://password@server:443?..." autofocus></textarea>
+          <div class="input-footer">
+            <span id="inputHint">支持一次粘贴一个链接</span>
+            <button class="primary-btn" id="convertBtn" type="button">
+              <span>转换配置</span><b>↗</b>
+            </button>
+          </div>
+          <div class="examples">
+            <span>快速示例</span>
+            <button type="button" data-example="vless">VLESS Reality</button>
+            <button type="button" data-example="hy2">Hysteria2</button>
+          </div>
+        </div>
+
+        <div class="output-panel panel" aria-live="polite">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">02 · OUTPUT</p>
+              <h2>Clash Meta YAML</h2>
+            </div>
+            <div class="output-actions">
+              <button class="icon-btn" id="copyBtn" type="button" title="复制 YAML" disabled>复制</button>
+              <button class="icon-btn" id="downloadBtn" type="button" title="下载配置" disabled>下载</button>
+            </div>
+          </div>
+          <div class="code-wrap" id="codeWrap">
+            <pre id="yamlOutput"><code><span class="placeholder-mark">{ }</span>
+
+<span class="placeholder-text">转换结果将显示在这里</span></code></pre>
+            <div class="copy-toast" id="copyToast">已复制到剪贴板</div>
+          </div>
+          <div class="output-footer" id="outputFooter">生成后可作为完整的 <code>proxies:</code> 配置片段使用。</div>
+        </div>
+      </section>
+
+      <section class="details" id="details" hidden>
+        <div class="detail-title"><span></span>已识别参数</div>
+        <div class="detail-grid" id="detailGrid"></div>
+      </section>
+
+      <section class="guide">
+        <div class="guide-intro"><p class="section-kicker">MADE FOR SING-BOX COMPATIBLE META</p><h2>只保留 Meta 真正需要的字段。</h2></div>
+        <div class="guide-items">
+          <article><span>V</span><h3>VLESS + Reality</h3><p>自动映射 Vision flow、Reality 公钥、short ID、SNI 与指纹。</p></article>
+          <article><span>H</span><h3>Hysteria2</h3><p>支持密码、SNI、ALPN、跳过证书验证与 salamander 混淆。</p></article>
+          <article><span>⌁</span><h3>纯本地处理</h3><p>不发送、储存或记录你的服务器地址和认证信息。</p></article>
+        </div>
+      </section>
+    </main>
+    <footer>LINKFORM / META YAML CONVERTER <span>·</span> 2026</footer>
+    <script src="./app.js"></script>
+  </body>
+</html>
