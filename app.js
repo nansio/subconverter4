@@ -22,7 +22,7 @@ function listParam(value) { return value ? value.split(',').map(item => item.tri
 function escapeHtml(str) { return str.replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' })[c]); }
 
 function shouldQuoteString(key, str) {
-  if (key === 'spider-x' || key === 'path' || str.startsWith('/')) {
+  if (key === 'path' || str.startsWith('/')) {
     return true;
   }
   if (str === '') {
@@ -72,8 +72,6 @@ function parseVless(url) {
     const realityOpts = { 'public-key': publicKey };
     const sid = p.get('sid') || p.get('shortId') || p.get('short-id') || p.get('short_id');
     if (sid) realityOpts['short-id'] = sid;
-    const spx = p.get('spx') || p.get('spiderX') || p.get('spider-x') || p.get('spider_x');
-    if (spx) realityOpts['spider-x'] = decode(spx);
     proxy['reality-opts'] = realityOpts;
   }
 
