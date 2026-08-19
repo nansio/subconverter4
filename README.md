@@ -5,6 +5,6 @@
 - `vless://`（Reality / Vision、TCP、WS、gRPC）
 - `hysteria2://` 或 `hy2://`（含 salamander 混淆）
 
-即可获得可复制或下载的 Clash Meta `proxies` 片段。每个代理项使用 Mihomo 支持的单行 JSON（YAML 流式对象）格式。
+即可获得可复制或下载的 Clash Meta 代理项单行配置。每个代理项使用 Mihomo 支持的单行 JSON（YAML 流式对象）格式。
 
 链接不会发送到任何服务端。
