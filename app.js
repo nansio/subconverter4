@@ -133,6 +133,29 @@ function flowMap(object) {
 function makeYaml(items) {
   latestYaml = items.map(item => `- ${flowMap(item)}`).join('\n');
   output.innerHTML = `<code>${escapeHtml(latestYaml)}</code>`;
+  return latestYaml;
+}
+
+async function copyToClipboard(text, successMessage = '已复制到剪贴板') {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const area = document.createElement('textarea');
+    try {
+      area.value = text;
+      document.body.append(area);
+      area.select();
+      if (!document.execCommand('copy')) return false;
+    } catch {
+      return false;
+    } finally {
+      area.remove();
+    }
+  }
+  copyToast.textContent = successMessage;
+  copyToast.classList.add('show');
+  setTimeout(() => copyToast.classList.remove('show'), 1600);
+  return true;
 }
 
 function showDetails(proxies) {
@@ -159,7 +182,7 @@ function fail(message) {
   details.hidden = true;
 }
 
-function convert() {
+async function convert() {
   try {
     const links = sourceLink.value.match(/(?:vless|hysteria2|hy2):\/\/[^\s]+/gi) || [];
     if (!links.length) throw new Error('请粘贴至少一个 vless://、hysteria2:// 或 hy2:// 链接。');
@@ -167,14 +190,17 @@ function convert() {
       const url = parseUrl(link);
       return url.protocol === 'vless:' ? parseVless(url) : parseHy2(url);
     });
-    makeYaml(proxies);
+    const yaml = makeYaml(proxies);
     showDetails(proxies);
     copyBtn.disabled = false;
     downloadBtn.disabled = false;
     protocolChip.textContent = `${proxies.length} 个节点`;
     protocolChip.classList.add('active');
     inputHint.textContent = `已成功识别并映射 ${proxies.length} 个节点`;
-    $('#outputFooter').innerHTML = `已生成 ${proxies.length} 个单行 JSON 代理项，可直接合并或下载。`;
+    const copied = await copyToClipboard(yaml, '转换成功，已复制到剪贴板');
+    $('#outputFooter').textContent = copied
+      ? `已生成 ${proxies.length} 个单行 JSON 代理项，并自动复制到剪贴板。`
+      : `已生成 ${proxies.length} 个单行 JSON 代理项；自动复制失败，请点击“复制”。`;
   } catch (err) {
     fail(err.message);
     protocolChip.textContent = '格式有误';
@@ -198,20 +224,7 @@ document.querySelectorAll('[data-example]').forEach(btn =>
     convert();
   })
 );
-copyBtn.addEventListener('click', async () => {
-  try {
-    await navigator.clipboard.writeText(latestYaml);
-  } catch {
-    const area = document.createElement('textarea');
-    area.value = latestYaml;
-    document.body.append(area);
-    area.select();
-    document.execCommand('copy');
-    area.remove();
-  }
-  copyToast.classList.add('show');
-  setTimeout(() => copyToast.classList.remove('show'), 1600);
-});
+copyBtn.addEventListener('click', () => copyToClipboard(latestYaml));
 downloadBtn.addEventListener('click', () => {
   const blob = new Blob([latestYaml + '\n'], { type: 'text/yaml;charset=utf-8' });
   const a = document.createElement('a');
@@ -220,4 +233,3 @@ downloadBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(a.href);
 });
-
