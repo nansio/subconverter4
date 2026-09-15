@@ -69,7 +69,10 @@ function parseVless(url) {
   if (security === 'reality') {
     const publicKey = p.get('pbk') || p.get('publicKey') || p.get('public-key');
     if (!publicKey) throw new Error('Reality 链接缺少 pbk（公钥）参数。');
-    const realityOpts = { 'public-key': publicKey };
+    const realityOpts = {
+      'public-key': publicKey,
+      'support-x25519mlkem768': true
+    };
     const sid = p.get('sid') || p.get('shortId') || p.get('short-id') || p.get('short_id');
     if (sid) realityOpts['short-id'] = sid;
     proxy['reality-opts'] = realityOpts;
