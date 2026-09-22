@@ -22,7 +22,7 @@
       <section class="hero" id="top">
         <p class="eyebrow">CLASH META CONFIG BUILDER</p>
         <h1>把分享链接，变成<br /><em>可用的代理配置。</em></h1>
-        <p class="hero-copy">支持 3x-ui 等面板生成的 VLESS + Reality + Vision 与 Hysteria2 链接。可一次粘贴多条，所有解析均在浏览器本地完成。</p>
+        <p class="hero-copy">支持 3x-ui 等面板生成的 VLESS + Reality + Vision、Hysteria2 与 Shadowsocks 2022 链接。可一次粘贴多条，所有解析均在浏览器本地完成。</p>
       </section>
 
       <section class="workspace" aria-label="转换工作台">
@@ -34,8 +34,8 @@
             </div>
             <span class="protocol-chip" id="detectedProtocol">等待输入</span>
           </div>
-          <label class="sr-only" for="sourceLink">VLESS 或 Hysteria2 分享链接</label>
-          <textarea id="sourceLink" spellcheck="false" placeholder="每行粘贴一个链接，可一次输入多条&#10;vless://uuid@server:443?encryption=none&security=reality&...#我的节点&#10;hysteria2://password@server:443?...#另一节点" autofocus></textarea>
+          <label class="sr-only" for="sourceLink">VLESS、Hysteria2 或 Shadowsocks 2022 分享链接</label>
+          <textarea id="sourceLink" spellcheck="false" placeholder="每行粘贴一个链接，可一次输入多条&#10;vless://uuid@server:443?encryption=none&security=reality&...#我的节点&#10;hysteria2://password@server:443?...#另一节点&#10;ss://base64-user-info@server:8388#SS2022节点" autofocus></textarea>
           <div class="input-footer">
             <span id="inputHint">每行一个链接，支持批量转换</span>
             <button class="primary-btn" id="convertBtn" type="button">
@@ -46,6 +46,7 @@
             <span>快速示例</span>
             <button type="button" data-example="vless">VLESS Reality</button>
             <button type="button" data-example="hy2">Hysteria2</button>
+            <button type="button" data-example="ss2022">SS 2022</button>
           </div>
         </div>
 
@@ -80,6 +81,7 @@
         <div class="guide-items">
           <article><span>V</span><h3>VLESS + Reality</h3><p>自动映射 Vision flow、Reality 公钥、short ID、SNI 与指纹。</p></article>
           <article><span>H</span><h3>Hysteria2</h3><p>支持密码、SNI、ALPN、跳过证书验证与 salamander 混淆。</p></article>
+          <article><span>S</span><h3>Shadowsocks 2022</h3><p>支持 2022-blake3-aes-256-gcm 分享链接与 SIP002 认证格式。</p></article>
           <article><span>⌁</span><h3>纯本地处理</h3><p>不发送、储存或记录你的服务器地址和认证信息。</p></article>
         </div>
       </section>
