@@ -13,13 +13,20 @@ let latestYaml = '';
 
 const examples = {
   vless: 'vless://47459c58-47d3-43cf-afdb-67bc9d4ee03c@1.2.3.4:3443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=nextcloud.ireina.io&fp=chrome&pbk=Q7UWXwC5y0gH9HGebh2k1fAxlllSTtWNj34oox3AD0g&sid=ecd934&spx=%2Fe8&type=tcp#xx',
-  hy2: 'hysteria2://a-strong-password@hysteria.example.com:443?sni=www.apple.com&insecure=0&alpn=h3&obfs=salamander&obfs-password=obfs-secret#Tokyo%20HY2'
+  hy2: 'hysteria2://a-strong-password@hysteria.example.com:443?sni=www.apple.com&insecure=0&alpn=h3&obfs=salamander&obfs-password=obfs-secret#Tokyo%20HY2',
+  ss2022: 'ss://MjAyMi1ibGFrZTMtYWVzLTI1Ni1nY206QUFFQ0F3UUZCZ2NJQ1FvTERBME9EeEFSRWhNVUZSWVhHQmthR3h3ZEhoOD0@ss.example.com:8388#Tokyo%20SS2022'
 };
 
 function decode(value = '') { try { return decodeURIComponent(value.replace(/\+/g, '%20')); } catch { return value; } }
+function decodeUserInfo(value = '') { try { return decodeURIComponent(value); } catch { return value; } }
 function truthy(value) { return ['1', 'true', 'yes'].includes(String(value).toLowerCase()); }
 function listParam(value) { return value ? value.split(',').map(item => item.trim()).filter(Boolean) : undefined; }
 function escapeHtml(str) { return str.replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' })[c]); }
+
+function decodeBase64Url(value) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '='));
+}
 
 function shouldQuoteString(key, str) {
   if (key === 'path' || str.startsWith('/')) {
@@ -37,9 +44,44 @@ function shouldQuoteString(key, str) {
 function parseUrl(raw) {
   const cleaned = raw.trim().split(/\s+/)[0];
   if (!cleaned) throw new Error('请先粘贴一个分享链接。');
-  if (!/^(vless|hysteria2|hy2):\/\//i.test(cleaned)) throw new Error('仅支持 vless://、hysteria2:// 或 hy2:// 链接。');
+  if (!/^(vless|hysteria2|hy2|ss):\/\//i.test(cleaned)) throw new Error('仅支持 vless://、hysteria2://、hy2:// 或 ss:// 链接。');
   const normalized = cleaned.replace(/^hy2:\/\//i, 'hysteria2://');
   try { return new URL(normalized); } catch { throw new Error('链接格式无法识别，请检查是否完整。'); }
+}
+
+function parseSs2022(url) {
+  let method;
+  let password;
+
+  if (url.password) {
+    method = decodeUserInfo(url.username);
+    password = decodeUserInfo(url.password);
+  } else {
+    try {
+      const userInfo = decodeBase64Url(decodeUserInfo(url.username));
+      const separator = userInfo.indexOf(':');
+      if (separator === -1) throw new Error();
+      method = userInfo.slice(0, separator);
+      password = userInfo.slice(separator + 1);
+    } catch {
+      throw new Error('SS 链接的认证信息格式无效。');
+    }
+  }
+
+  if (method !== '2022-blake3-aes-256-gcm') {
+    throw new Error(`暂不支持 SS 的 ${method || '未知'} 加密方式。`);
+  }
+  if (!password) throw new Error('SS 2022 链接缺少密码。');
+
+  return {
+    name: decode(url.hash.slice(1)) || `${url.hostname} · SS 2022`,
+    type: 'ss',
+    server: url.hostname,
+    port: Number(url.port || 8388),
+    cipher: method,
+    password,
+    udp: true
+  };
 }
 
 function parseVless(url) {
@@ -166,7 +208,7 @@ function showDetails(proxies) {
     ['节点名称', proxy => proxy.name],
     ['协议', proxy => proxy.type],
     ['服务器', proxy => `${proxy.server}:${proxy.port}`],
-    ['传输', proxy => proxy.network || 'QUIC'],
+    ['传输', proxy => proxy.network || (proxy.type === 'ss' ? 'TCP / UDP' : 'QUIC')],
     ['TLS SNI', proxy => proxy.servername || proxy.sni || '未设置'],
     ['Vision / 混淆', proxy => proxy.flow || proxy.obfs || '默认'],
     ['指纹 / ALPN', proxy => proxy['client-fingerprint'] || proxy.alpn?.join(', ') || '默认'],
@@ -187,11 +229,13 @@ function fail(message) {
 
 async function convert() {
   try {
-    const links = sourceLink.value.match(/(?:vless|hysteria2|hy2):\/\/[^\s]+/gi) || [];
-    if (!links.length) throw new Error('请粘贴至少一个 vless://、hysteria2:// 或 hy2:// 链接。');
+    const links = sourceLink.value.match(/(?:vless|hysteria2|hy2|ss):\/\/[^\s]+/gi) || [];
+    if (!links.length) throw new Error('请粘贴至少一个 vless://、hysteria2://、hy2:// 或 ss:// 链接。');
     const proxies = links.map(link => {
       const url = parseUrl(link);
-      return url.protocol === 'vless:' ? parseVless(url) : parseHy2(url);
+      if (url.protocol === 'vless:') return parseVless(url);
+      if (url.protocol === 'ss:') return parseSs2022(url);
+      return parseHy2(url);
     });
     const yaml = makeYaml(proxies);
     showDetails(proxies);
@@ -217,7 +261,7 @@ sourceLink.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') convert();
 });
 sourceLink.addEventListener('input', () => {
-  const links = sourceLink.value.match(/(?:vless|hysteria2|hy2):\/\/[^\s]+/gi) || [];
+  const links = sourceLink.value.match(/(?:vless|hysteria2|hy2|ss):\/\/[^\s]+/gi) || [];
   protocolChip.textContent = links.length ? `${links.length} 个链接` : '等待输入';
   protocolChip.classList.toggle('active', Boolean(links.length));
 });
