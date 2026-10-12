@@ -218,9 +218,14 @@ function parseHy2(url) {
 }
 
 function flowMap(object) {
-  // JSON is valid YAML flow syntax and preserves passwords that resemble numbers,
-  // booleans or null, as well as whitespace and escaped control characters.
-  return JSON.stringify(object);
+  if (Array.isArray(object)) return `[${object.map(flowMap).join(', ')}]`;
+  if (object !== null && typeof object === 'object') {
+    return `{${Object.entries(object)
+      .filter(([, value]) => value !== undefined)
+      .map(([key, value]) => `${key}: ${flowMap(value)}`)
+      .join(', ')}}`;
+  }
+  return String(object);
 }
 
 function makeYaml(items) {
@@ -295,8 +300,8 @@ async function convert() {
     inputHint.textContent = `已成功识别并映射 ${proxies.length} 个节点`;
     const copied = await copyToClipboard(yaml, '转换成功，已复制到剪贴板');
     $('#outputFooter').textContent = copied
-      ? `已生成 ${proxies.length} 个单行 JSON 代理项，并自动复制到剪贴板。`
-      : `已生成 ${proxies.length} 个单行 JSON 代理项；自动复制失败，请点击“复制”。`;
+      ? `已生成 ${proxies.length} 个单行代理项，并自动复制到剪贴板。`
+      : `已生成 ${proxies.length} 个单行代理项；自动复制失败，请点击“复制”。`;
   } catch (err) {
     fail(err.message);
     protocolChip.textContent = '格式有误';

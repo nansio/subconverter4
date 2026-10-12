@@ -38,13 +38,12 @@ test('rejects invalid hop intervals, pins and obfuscation',()=>{
 test('optional auth and default port follow the official URI',()=>{
  assert.equal(hy('hysteria2://example.com/').port,443); assert.equal(hy('hysteria2://example.com/').password,'');
 });
-test('strict JSON output preserves string types and control characters',()=>{
- const p=hy('hy2://00123@example.com/#true');
- const rendered=vm.runInContext(`flowMap(${JSON.stringify(p)})`,context);
- assert.deepEqual(JSON.parse(rendered),p);
- assert.equal(JSON.parse(rendered).password,'00123');
- const special={password:'a\nb\t"c',name:'null',ports:'443,8443'};
- assert.deepEqual(JSON.parse(vm.runInContext(`flowMap(${JSON.stringify(special)})`,context)),special);
+test('output leaves keys and values unquoted, including nested objects and arrays',()=>{
+ const rendered=vm.runInContext(`flowMap({name: 'Tokyo HY2', port: 443, password: '00123', tls: true, alpn: ['h3', 'h2'], 'reality-opts': {'public-key': 'abc', 'support-x25519mlkem768': true}, missing: undefined})`,context);
+ assert.equal(rendered,'{name: Tokyo HY2, port: 443, password: 00123, tls: true, alpn: [h3, h2], reality-opts: {public-key: abc, support-x25519mlkem768: true}}');
+});
+test('multiple output items use the same unquoted format',()=>{
+ assert.equal(vm.runInContext(`makeYaml([{name: 'one', password: 'a+b:c'}, {name: 'two', udp: true}])`,context), '- {name: one, password: a+b:c}\n- {name: two, udp: true}');
 });
 test('VLESS Reality and SS2022 conversions remain supported',()=>{
  const result=vm.runInContext(`JSON.stringify([parseVless(parseUrl(examples.vless)),parseSs2022(parseUrl(examples.ss2022))])`,context);
