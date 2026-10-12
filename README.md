@@ -6,7 +6,7 @@
 - `hysteria2://` 或 `hy2://`（端口跳跃、salamander / gecko 混淆、证书指纹与 ECH）
 - `ss://`（`2022-blake3-aes-256-gcm`，支持 SIP002 Base64 或明文认证信息）
 
-即可获得可复制或下载的 Clash Meta 代理项单行配置。转换成功后，结果会自动复制到剪贴板；每个代理项使用 Mihomo 支持的单行 JSON（YAML 流式对象）格式。
+即可获得可复制或下载的 Clash Meta 代理项单行配置。转换成功后，结果会自动复制到剪贴板；每个代理项使用单行对象格式，属性名和值均不添加引号（包括嵌套对象和数组）。
 
 对于 `security=reality` 的 VLESS 节点，转换结果会自动在 `reality-opts` 中加入：
 
@@ -26,15 +26,15 @@ support-x25519mlkem768: true
 hy2://user:pa%2Bss@example.com:443,20000-30000/?sni=example.com#HY2
 ```
 
-端口范围和列表转换为 Mihomo 的 `ports`；完整认证信息保留为 `password: "user:pa+ss"`。IPv6 地址请使用 `[2001:db8::1]` 格式，输出的 `server` 会去掉方括号。
+端口范围和列表转换为 Mihomo 的 `ports`；完整认证信息保留为 `password: user:pa+ss`。IPv6 地址请使用 `[2001:db8::1]` 格式，输出的 `server` 会去掉方括号。
 
 - `pinSHA256` 转换为 `fingerprint`，接受 64 位十六进制 SHA-256 指纹或冒号分隔形式。
-- `ech` 转换为 `ech-opts: {enable: true, config: "..."}`。
+- `ech` 转换为 `ech-opts: {enable: true, config: ...}`。
 - 兼容第三方扩展 `mport` / `ports` 和 `hop-interval` / `hopInterval`。间隔单位为秒，支持 `15` 或 `15-30`；省略时使用 Mihomo 默认的 30 秒。官方普通 HY2 URI 不包含跳跃间隔参数。
 - `gecko` 支持扩展参数 `obfs-min-packet-size`、`obfs-max-packet-size`。需使用支持 gecko 的 Mihomo 版本。
 - 不支持的混淆、无效端口或冲突的跳跃配置会报错；`hysteria2+realm://` 和 `hysteria2+realm+http://` 会明确提示暂不支持。
 
-输出是带 YAML 列表前缀的严格单行 JSON 对象，可放在完整 Mihomo 配置的 `proxies` 下；下载内容仅包含代理项，并非完整配置文件。
+输出带有 YAML 列表前缀；下载内容仅包含代理项，并非完整配置文件。无引号输出不是严格 JSON；含逗号、换行等 YAML 特殊字符的值，以及类似数字、布尔值或空值的字符串，可能需要手动调整才能被 Mihomo 正确解析。
 
 ## 本地开发与验证
 
