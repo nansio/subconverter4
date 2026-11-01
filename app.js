@@ -206,8 +206,8 @@ function parseHy2(url) {
     ...packetSizes,
     fingerprint,
     'ech-opts': p.get('ech') ? { enable: true, config: p.get('ech') } : undefined,
-    up: p.get('upmbps') || p.get('up') || undefined,
-    down: p.get('downmbps') || p.get('down') || undefined
+    up: p.get('upmbps') || p.get('up') || '30mbps',
+    down: p.get('downmbps') || p.get('down') || '80mbps'
   };
 
   if (truthy(p.get('insecure') || p.get('allowInsecure'))) {
