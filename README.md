@@ -30,6 +30,7 @@ hy2://user:pa%2Bss@example.com:443,20000-30000/?sni=example.com#HY2
 
 - `pinSHA256` 转换为 `fingerprint`，接受 64 位十六进制 SHA-256 指纹或冒号分隔形式。
 - `ech` 转换为 `ech-opts: {enable: true, config: ...}`。
+- 默认添加 `up: 30mbps` 和 `down: 80mbps`；链接指定 `upmbps` / `up` 或 `downmbps` / `down` 时，优先保留对应参数值。
 - 兼容第三方扩展 `mport` / `ports` 和 `hop-interval` / `hopInterval`。间隔单位为秒，支持 `15` 或 `15-30`；省略时使用 Mihomo 默认的 30 秒。官方普通 HY2 URI 不包含跳跃间隔参数。
 - `gecko` 支持扩展参数 `obfs-min-packet-size`、`obfs-max-packet-size`。需使用支持 gecko 的 Mihomo 版本。
 - 不支持的混淆、无效端口或冲突的跳跃配置会报错；`hysteria2+realm://` 和 `hysteria2+realm+http://` 会明确提示暂不支持。
