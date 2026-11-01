@@ -170,7 +170,7 @@ function parseHy2(url) {
   if (hopInterval) {
     const [min, max = min] = hopInterval.split('-').map(Number);
     if (!/^\d+(?:-\d+)?$/.test(hopInterval) || !Number.isSafeInteger(min) || !Number.isSafeInteger(max) || min < 5 || max < min) {
-      throw new Error('HY2 跳跃间隔应为至少 5 秒的整数，或 15-30 形式的范围。');
+      throw new Error('HY2 跳跃间隔应为至少 5 秒的整数，或 15-45 形式的范围。');
     }
     if (!ports) throw new Error('HY2 跳跃间隔需要同时指定多端口或 ports/mport。');
   }
@@ -197,7 +197,7 @@ function parseHy2(url) {
     server: url.hostname.replace(/^\[|\]$/g, ''),
     port: Number(url.port || 443),
     ports,
-    'hop-interval': hopInterval || undefined,
+    'hop-interval': hopInterval || (ports ? '15-45' : undefined),
     password: url.hy2Auth,
     sni: p.get('sni') || p.get('peer') || undefined,
     alpn: listParam(p.get('alpn')),
@@ -261,7 +261,7 @@ function showDetails(proxies) {
     ['节点名称', proxy => proxy.name],
     ['协议', proxy => proxy.type],
     ['服务器', proxy => `${proxy.server.includes(':') ? '[' + proxy.server.replace(/^\[|\]$/g, '') + ']' : proxy.server}:${proxy.ports || proxy.port}`],
-    ['端口跳跃', proxy => proxy.ports ? `${proxy['hop-interval'] || 30} 秒` : '未启用'],
+    ['端口跳跃', proxy => proxy.ports ? `${proxy['hop-interval']} 秒` : '未启用'],
     ['传输', proxy => proxy.network || (proxy.type === 'ss' ? 'TCP / UDP' : 'QUIC')],
     ['TLS SNI', proxy => proxy.servername || proxy.sni || '未设置'],
     ['Vision / 混淆', proxy => proxy.flow || proxy.obfs || '默认'],
