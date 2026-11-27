@@ -42,6 +42,14 @@ test('output leaves keys and values unquoted, including nested objects and array
  const rendered=vm.runInContext(`flowMap({name: 'Tokyo HY2', port: 443, password: '00123', tls: true, alpn: ['h3', 'h2'], 'reality-opts': {'public-key': 'abc', 'support-x25519mlkem768': true}, missing: undefined})`,context);
  assert.equal(rendered,'{name: Tokyo HY2, port: 443, password: 00123, tls: true, alpn: [h3, h2], reality-opts: {public-key: abc, support-x25519mlkem768: true}}');
 });
+test('REALITY short IDs always use double quotes without changing other fields',()=>{
+  for (const sid of ['37e9', '001234', '123456', 'abcd', '00', 'abcdef0123456789']) {
+    const rendered=vm.runInContext(`flowMap(parseVless(parseUrl(examples.vless.replace('sid=ecd934', 'sid=${sid}'))))`,context);
+    assert.ok(rendered.includes(`short-id: "${sid}"`));
+    assert.ok(rendered.includes('support-x25519mlkem768: true'));
+    assert.ok(rendered.includes('port: 3443'));
+  }
+});
 test('multiple output items use the same unquoted format',()=>{
  assert.equal(vm.runInContext(`makeYaml([{name: 'one', password: 'a+b:c'}, {name: 'two', udp: true}])`,context), '- {name: one, password: a+b:c}\n- {name: two, udp: true}');
 });
