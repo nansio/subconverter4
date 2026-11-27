@@ -222,7 +222,7 @@ function flowMap(object) {
   if (object !== null && typeof object === 'object') {
     return `{${Object.entries(object)
       .filter(([, value]) => value !== undefined)
-      .map(([key, value]) => `${key}: ${flowMap(value)}`)
+      .map(([key, value]) => `${key}: ${key === 'short-id' && typeof value === 'string' ? JSON.stringify(value) : flowMap(value)}`)
       .join(', ')}}`;
   }
   return String(object);
